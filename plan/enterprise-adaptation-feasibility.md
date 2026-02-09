@@ -27,7 +27,7 @@ After this work, we will know whether this fork can be narrowed to an enterprise
 - [x] (2026-02-09) Implemented Milestone 3 runtime profile gate for `enterprise_minimal` in config + CLI startup paths.
 - [x] (2026-02-09) Added Milestone 3 test coverage for provider/channel policy rejection and CLI agent acceptance in enterprise profile mode.
 - [x] (2026-02-09) Implemented Milestone 4 Teams feasibility stub channel with inbound/outbound mapping and channel manager wiring.
-- [x] (2026-02-09) Added Teams spike tests and validated suite (`23 passed, 1 warning`).
+- [x] (2026-02-09) Added Teams spike tests and validated suite (`24 passed, 1 warning`).
 - [x] (2026-02-09 08:49Z) Establish a reproducible local baseline environment (dependencies, tests, smoke run).
 - [x] (2026-02-09 08:49Z) Complete Milestone 1 repository and risk inventory with explicit keep/remove candidates.
 - [x] (2026-02-09 09:16Z) Complete Milestone 2 security baseline gate (close critical/high risks before channel expansion).
