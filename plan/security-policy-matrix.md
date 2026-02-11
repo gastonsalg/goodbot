@@ -38,6 +38,19 @@ Configuration controls (`tools` section):
 - `allowed_tools`: optional allowlist; when non-empty, only listed tools may run.
 - `restrict_to_workspace`: defaults to `true`.
 
+## Restricted Exec Policy (Milestone 7)
+
+When `tools.restrict_to_workspace=true` and `exec` is enabled by policy:
+
+- Exec command execution uses parsed argv + `subprocess_exec` (no shell evaluation path).
+- Shell control operators are rejected (for example `;`, `&&`, `||`, pipes, redirects, grouping).
+- Shell expansion forms are rejected (for example `$VAR`, `${...}`, `$(...)`, `~`).
+- Inline environment assignments are rejected (`VAR=value cmd`).
+- Command names must match explicit allowlist entries from `tools.exec.allowed_commands`.
+- Allowlist supports optional subcommand scoping via `command:subcommand` entries.
+- Execution `working_dir` must remain within the configured workspace root.
+- Path-like arguments are validated against the resolved execution `working_dir`.
+
 ## Filesystem Boundary Policy
 
 - Path checks use canonical ancestry validation (`Path.resolve` + `relative_to`) instead of string-prefix matching.

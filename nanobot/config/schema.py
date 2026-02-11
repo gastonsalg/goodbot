@@ -230,6 +230,29 @@ class WebToolsConfig(BaseModel):
 class ExecToolConfig(BaseModel):
     """Shell exec tool configuration."""
     timeout: int = 60
+    allowed_commands: list[str] = Field(
+        default_factory=lambda: [
+            "ls",
+            "cat",
+            "head",
+            "tail",
+            "wc",
+            "grep",
+            "rg",
+            "find",
+            "pwd",
+            "echo",
+            "stat",
+            "git:status",
+            "git:diff",
+            "git:log",
+            "git:show",
+            "git:rev-parse",
+            "git:branch",
+            "git:ls-files",
+            "pytest",
+        ]
+    )
 
 
 class ToolsConfig(BaseModel):
