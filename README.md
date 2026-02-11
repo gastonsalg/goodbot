@@ -22,11 +22,12 @@ The adaptation work is tracked in:
 - `plan/security-policy-matrix.md`
 - `FORK-DIFFERENCES.md` (upstream vs fork divergence register)
 
-As of 2026-02-09:
+As of 2026-02-11:
 
 - Milestone 1 (inventory/contract) is complete.
 - Milestone 2 (security baseline gate) is complete.
-- Remaining work includes minimal enterprise profile completion, Teams feasibility, connector interfaces, and upstream sync rehearsal.
+- Milestone 7 (restricted execution architecture hardening) is complete.
+- Remaining work includes connector interfaces and final feasibility recommendation.
 
 ## Security Baseline Defaults
 
@@ -71,6 +72,7 @@ Important defaults in this fork:
 
 - `tools.restrictToWorkspace` defaults to `true`.
 - `tools.blockedTools` has a default deny list for high-risk tools.
+- `tools.exec.allowedCommands` defines the explicit restricted exec allowlist (supports `command:subcommand` entries).
 - Channel configs include `allowUnlistedSenders` (default `false`).
 - WhatsApp channel includes `bridgeToken` for bridge command authentication.
 

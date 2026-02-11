@@ -35,9 +35,10 @@ After this work, we will know whether this fork can be narrowed to an enterprise
 - [x] (2026-02-09) Complete Milestone 4 Microsoft Teams channel feasibility spike.
 - [x] (2026-02-11 08:00Z) Researched a local `tinyclaw` clone as an alternative baseline and recorded implementation ideas suitable for this fork.
 - [x] (2026-02-11 08:00Z) Fetched `upstream/main` and confirmed 28 new commits are pending for downstream sync review before further implementation.
+- [x] (2026-02-11) Implemented Milestone 7 restricted execution architecture in `ExecTool` for workspace-restricted mode (argv execution, explicit allowlist, no shell grammar) with updated regression coverage.
 - [ ] Complete Milestone 5 extension interface spike (Microsoft/Jira/Confluence/Miro adapter contracts with stubs).
 - [ ] Complete Milestone 6 upstream sync rehearsal and conflict-cost measurement.
-- [ ] Define and execute a post-sync architectural hardening plan for restricted command execution (replace shell-string guarding with structured execution controls).
+- [x] (2026-02-11) Define and execute a post-sync architectural hardening plan for restricted command execution (replace shell-string guarding with structured execution controls).
 - [ ] Produce final feasibility recommendation and implementation roadmap.
 
 ## Surprises & Discoveries
@@ -80,6 +81,9 @@ After this work, we will know whether this fork can be narrowed to an enterprise
 
 - Observation: Regex/token-based shell guarding is prone to recurring bypass discoveries as more shell grammar features are exercised (expansions, quoting, parameter operators, assignments).
   Evidence: successive PR #9 reviews uncovered additional `restrict_to_workspace` bypass classes despite incremental patches.
+
+- Observation: Restricted exec mode now enforces argv-only execution and rejects shell grammar by design, which is materially safer but intentionally less flexible than shell parsing.
+  Evidence: `nanobot/agent/tools/shell.py` now uses `create_subprocess_exec` under `restrict_to_workspace`, blocks shell operators/expansions/assignments, and applies explicit command allowlisting.
 
 ## Decision Log
 
@@ -135,6 +139,10 @@ After this work, we will know whether this fork can be narrowed to an enterprise
   Rationale: Shell-string parsing is brittle and leads to recurring bypass classes; a structured execution model (no `sh -c`, strict allowlist, and runtime sandboxing) provides a more reliable boundary.
   Date/Author: 2026-02-11 / Codex
 
+- Decision: In restricted mode, execute only parsed argv commands through `subprocess_exec` and require explicit command allowlisting (including optional subcommand-scoped entries).
+  Rationale: This removes shell interpretation from the restricted path and makes policy enforcement deterministic across known bypass classes.
+  Date/Author: 2026-02-11 / Codex
+
 ## Outcomes & Retrospective
 
 Milestone 1 outcome (2026-02-09): baseline environment is reproducible in `.venv`, tests pass after editable install, and the enterprise target contract is documented in `plan/enterprise-inventory.md` with explicit keep/disable/remove candidates.
@@ -152,6 +160,8 @@ Remaining outcomes to summarize at later milestones:
 3. Estimated ongoing cost of upstream sync and risk controls required.
 
 Current checkpoint outcome (2026-02-11): TinyClaw assessment completed. The fork will borrow two implementation ideas for future milestones: (1) optional provider adapter using authenticated CLI execution in environments without API credits, and (2) explicit serialized processing guarantees that are test-proven rather than timer-assumed. Upstream change volume is now significant (28 commits), so sync is prioritized before new feature implementation.
+
+Milestone 7 outcome (2026-02-11): restricted command execution no longer relies on shell-string guarding in workspace-restricted mode. The runtime now parses commands into argv, rejects shell operators/expansions/environment assignments, enforces an explicit command allowlist (with subcommand scoping support), and validates both execution `cwd` and path arguments against workspace boundaries. Regression tests in `tests/test_shell_guard.py` cover known bypass classes.
 
 ## Context and Orientation
 
