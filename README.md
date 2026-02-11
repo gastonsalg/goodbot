@@ -1,4 +1,4 @@
-# goodbot Enterprise Fork
+# 🐶 goodbot
 
 This repository is an enterprise-focused downstream fork of [HKUDS/nanobot](https://github.com/HKUDS/nanobot).
 
