@@ -141,7 +141,7 @@ class ExecTool(Tool):
             # Normalize common shell path expansions so workspace checks cannot
             # be bypassed with forms like "~/.ssh/..." or "$HOME/.ssh/...".
             shell_expansion_paths = re.findall(
-                r"(?:^|[\s|><;&])((?:~|\$[A-Za-z_][A-Za-z0-9_]*|\$\{[A-Za-z_][A-Za-z0-9_]*\})/[^\s\"'<>|;&]+)",
+                r"(?:^|[\s|><;&])((?:~|\$[A-Za-z_][A-Za-z0-9_]*|\$\{[^}]+\})/[^\s\"'<>|;&]+)",
                 cmd,
             )
             expanded_paths: list[str] = []
@@ -166,7 +166,7 @@ class ExecTool(Tool):
                     elif candidate.startswith("~"):
                         token_paths.append(os.path.expanduser(candidate))
                     elif re.match(r"^\$[A-Za-z_][A-Za-z0-9_]*/", candidate) or re.match(
-                        r"^\$\{[A-Za-z_][A-Za-z0-9_]*\}/",
+                        r"^\$\{[^}]+\}/",
                         candidate,
                     ):
                         expanded = os.path.expandvars(candidate)
