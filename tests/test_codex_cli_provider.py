@@ -47,6 +47,8 @@ async def test_codex_cli_provider_uses_output_file_and_strips_openai_prefix(
     assert "--model" in args
     assert args[args.index("--model") + 1] == "gpt-5.3-codex"
     assert "--sandbox" in args
+    assert "--disable" in args
+    assert args[args.index("--disable") + 1] == "shell_tool"
     kwargs = captured["kwargs"]
     assert kwargs["cwd"] == str(tmp_path)
     assert kwargs["stdin"] == asyncio.subprocess.PIPE

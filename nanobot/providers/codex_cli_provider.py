@@ -45,6 +45,8 @@ class CodexCLIProvider(LLMProvider):
             "--skip-git-repo-check",
             "--sandbox",
             self.sandbox_mode,
+            "--disable",
+            "shell_tool",
             "--color",
             "never",
             "--output-last-message",
