@@ -173,6 +173,14 @@ class ExecTool(Tool):
                         if "$" in expanded:
                             return "Error: Command blocked by safety guard (unresolved path expansion in restricted mode)"
                         token_paths.append(expanded)
+                    elif re.match(r"^\$[A-Za-z_][A-Za-z0-9_]*$", candidate) or re.match(
+                        r"^\$\{[^}]+\}$",
+                        candidate,
+                    ):
+                        expanded = os.path.expandvars(candidate)
+                        if "$" in expanded:
+                            return "Error: Command blocked by safety guard (unresolved path expansion in restricted mode)"
+                        token_paths.append(expanded)
 
             for raw in win_paths + posix_paths + expanded_paths + token_paths:
                 try:

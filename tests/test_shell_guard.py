@@ -126,3 +126,46 @@ def test_workspace_guard_allows_braced_var_path_inside_workspace(tmp_path, monke
     err = tool._guard_command("cat ${NB_WORK}/notes.txt", str(tmp_path))
 
     assert err is None
+
+
+def test_workspace_guard_blocks_bare_home_var_token_outside_workspace(tmp_path, monkeypatch) -> None:
+    tool = ExecTool(restrict_to_workspace=True)
+    monkeypatch.setenv("HOME", str(tmp_path.parent))
+
+    err = tool._guard_command("ls $HOME", str(tmp_path))
+
+    assert err is not None
+    assert "path outside working dir" in err
+
+
+def test_workspace_guard_blocks_bare_quoted_braced_home_var_token_outside_workspace(
+    tmp_path, monkeypatch
+) -> None:
+    tool = ExecTool(restrict_to_workspace=True)
+    monkeypatch.setenv("HOME", str(tmp_path.parent))
+
+    err = tool._guard_command('ls "${HOME}"', str(tmp_path))
+
+    assert err is not None
+    assert "path outside working dir" in err
+
+
+def test_workspace_guard_blocks_cd_then_relative_access_outside_workspace(
+    tmp_path, monkeypatch
+) -> None:
+    tool = ExecTool(restrict_to_workspace=True)
+    monkeypatch.setenv("HOME", str(tmp_path.parent))
+
+    err = tool._guard_command("cd $HOME && cat .ssh/id_rsa", str(tmp_path))
+
+    assert err is not None
+    assert "path outside working dir" in err
+
+
+def test_workspace_guard_allows_bare_var_token_inside_workspace(tmp_path, monkeypatch) -> None:
+    tool = ExecTool(restrict_to_workspace=True)
+    monkeypatch.setenv("NB_WORK", str(tmp_path))
+
+    err = tool._guard_command("ls $NB_WORK", str(tmp_path))
+
+    assert err is None
