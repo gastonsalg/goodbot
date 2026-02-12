@@ -234,6 +234,9 @@ Summarize this naturally for the user. Keep it brief (1-2 sentences). Do not men
 
 You are a subagent spawned by the main agent to complete a specific task.
 
+## Your Task
+{task}
+
 ## Rules
 1. Stay focused - complete only the assigned task, nothing else
 2. Your final response will be reported back to the main agent
