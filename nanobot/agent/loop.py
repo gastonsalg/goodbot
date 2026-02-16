@@ -96,6 +96,7 @@ class AgentLoop:
         self._mcp_servers = mcp_servers or {}
         self._mcp_stack: AsyncExitStack | None = None
         self._mcp_connected = False
+        self._consolidation_tasks: dict[str, asyncio.Task[None]] = {}
         self._register_default_tools()
     
     def _register_default_tools(self) -> None:
@@ -161,6 +162,28 @@ class AgentLoop:
         if cron_tool := self.tools.get("cron"):
             if isinstance(cron_tool, CronTool):
                 cron_tool.set_context(channel, chat_id)
+
+    def _schedule_consolidation(self, session: Session, archive_all: bool = False) -> None:
+        """Schedule memory consolidation with single-flight per session."""
+        existing = self._consolidation_tasks.get(session.key)
+        if existing and not existing.done():
+            logger.debug(f"Session {session.key}: consolidation already running, skip new task")
+            return
+
+        async def _runner() -> None:
+            try:
+                await self._consolidate_memory(session, archive_all=archive_all)
+                if not archive_all:
+                    self.sessions.save(session)
+            except asyncio.CancelledError:
+                logger.debug(f"Session {session.key}: consolidation task cancelled")
+                raise
+            finally:
+                if self._consolidation_tasks.get(session.key) is task:
+                    self._consolidation_tasks.pop(session.key, None)
+
+        task = asyncio.create_task(_runner())
+        self._consolidation_tasks[session.key] = task
 
     async def _run_agent_loop(self, initial_messages: list[dict]) -> tuple[str | None, list[str]]:
         """
@@ -289,16 +312,15 @@ class AgentLoop:
         if cmd == "/new":
             # Capture messages before clearing (avoid race condition with background task)
             messages_to_archive = session.messages.copy()
+            existing = self._consolidation_tasks.get(session.key)
+            if existing and not existing.done():
+                existing.cancel()
             session.clear()
             self.sessions.save(session)
             self.sessions.invalidate(session.key)
-
-            async def _consolidate_and_cleanup():
-                temp_session = Session(key=session.key)
-                temp_session.messages = messages_to_archive
-                await self._consolidate_memory(temp_session, archive_all=True)
-
-            asyncio.create_task(_consolidate_and_cleanup())
+            temp_session = Session(key=session.key)
+            temp_session.messages = messages_to_archive
+            self._schedule_consolidation(temp_session, archive_all=True)
             return OutboundMessage(channel=msg.channel, chat_id=msg.chat_id,
                                   content="New session started. Memory consolidation in progress.")
         if cmd == "/help":
@@ -306,7 +328,7 @@ class AgentLoop:
                                   content="🐈 nanobot commands:\n/new — Start a new conversation\n/help — Show available commands")
         
         if len(session.messages) > self.memory_window:
-            asyncio.create_task(self._consolidate_memory(session))
+            self._schedule_consolidation(session)
 
         self._set_tool_context(msg.channel, msg.chat_id)
         initial_messages = self.context.build_messages(
