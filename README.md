@@ -71,6 +71,12 @@ Optional OpenAI-without-API-key path (Codex CLI seat auth):
 codex login
 ```
 
+Optional OpenAI Codex OAuth path (browser login flow):
+
+```bash
+goodbot provider login openai-codex
+```
+
 ## Configuration Notes
 
 Config lives at `~/.nanobot/config.json` (path intentionally kept for compatibility during fork evolution).
@@ -84,6 +90,7 @@ Important defaults in this fork:
 - WhatsApp channel includes `bridgeToken` for bridge command authentication.
 - OpenAI route can use local Codex CLI auth by setting `providers.openai.useCodexCli=true` with an `openai/...` model (no OpenAI API key required in config).
 - Codex CLI mode currently returns text responses only (no tool-call protocol).
+- OpenAI Codex OAuth route is supported with `agents.defaults.model` set to `openai-codex/...` (for example `openai-codex/gpt-5.1-codex`) after running `goodbot provider login openai-codex`.
 
 ## Upstream Sync Practice
 

@@ -19,6 +19,7 @@ from prompt_toolkit.history import FileHistory
 from prompt_toolkit.patch_stdout import patch_stdout
 
 from nanobot import __version__, __logo__
+from nanobot.config.schema import Config
 
 app = typer.Typer(
     name="goodbot",
@@ -287,11 +288,15 @@ This file stores important information that should persist across sessions.
     skills_dir.mkdir(exist_ok=True)
 
 
-def _make_provider(config):
+def _make_provider(config: Config):
     """Create LiteLLMProvider from config. Exits if no API key found."""
     from nanobot.providers.codex_cli_provider import CodexCLIProvider
     from nanobot.providers.litellm_provider import LiteLLMProvider
+    from nanobot.providers.openai_codex_provider import OpenAICodexProvider
+
     model = config.agents.defaults.model
+    provider_name = config.get_provider_name(model)
+    p = config.get_provider(model)
 
     # OpenAI model route can optionally use local Codex CLI auth instead of API keys.
     if model.lower().startswith("openai/") and config.providers.openai.use_codex_cli:
@@ -300,14 +305,18 @@ def _make_provider(config):
             working_dir=str(config.workspace_path),
         )
 
-    p = config.get_provider(model)
-    if not (p and p.api_key) and not model.startswith("bedrock/"):
+    # OpenAI Codex (OAuth): don't route via LiteLLM; use the dedicated implementation.
+    if provider_name == "openai_codex" or model.startswith("openai-codex/"):
+        return OpenAICodexProvider(default_model=model)
+
+    if not model.startswith("bedrock/") and not (p and p.api_key):
         console.print("[red]Error: No API key configured.[/red]")
         console.print(
             "Set one in ~/.nanobot/config.json under providers section, "
             "or enable providers.openai.useCodexCli for openai/* models."
         )
         raise typer.Exit(1)
+
     return LiteLLMProvider(
         api_key=p.api_key if p else None,
         api_base=config.get_api_base(model),
@@ -932,6 +941,53 @@ def status():
                     continue
                 has_key = bool(p.api_key)
                 console.print(f"{spec.label}: {'[green]✓[/green]' if has_key else '[dim]not set[/dim]'}")
+
+
+# ============================================================================
+# OAuth Login
+# ============================================================================
+
+provider_app = typer.Typer(help="Manage providers")
+app.add_typer(provider_app, name="provider")
+
+
+@provider_app.command("login")
+def provider_login(
+    provider: str = typer.Argument(..., help="OAuth provider to authenticate with (e.g., 'openai-codex')"),
+):
+    """Authenticate with an OAuth provider."""
+    console.print(f"{__logo__} OAuth Login - {provider}\n")
+
+    if provider == "openai-codex":
+        try:
+            from oauth_cli_kit import get_token, login_oauth_interactive
+            token = None
+            try:
+                token = get_token()
+            except Exception:
+                token = None
+            if not (token and token.access):
+                console.print("[cyan]No valid token found. Starting interactive OAuth login...[/cyan]")
+                console.print("A browser window may open for you to authenticate.\n")
+                token = login_oauth_interactive(
+                    print_fn=lambda s: console.print(s),
+                    prompt_fn=lambda s: typer.prompt(s),
+                )
+            if not (token and token.access):
+                console.print("[red]✗ Authentication failed[/red]")
+                raise typer.Exit(1)
+            console.print("[green]✓ Successfully authenticated with OpenAI Codex![/green]")
+            console.print(f"[dim]Account ID: {token.account_id}[/dim]")
+        except ImportError:
+            console.print("[red]oauth_cli_kit not installed. Run: pip install oauth-cli-kit[/red]")
+            raise typer.Exit(1)
+        except Exception as e:
+            console.print(f"[red]Authentication error: {e}[/red]")
+            raise typer.Exit(1)
+    else:
+        console.print(f"[red]Unknown OAuth provider: {provider}[/red]")
+        console.print("[yellow]Supported providers: openai-codex[/yellow]")
+        raise typer.Exit(1)
 
 
 if __name__ == "__main__":
