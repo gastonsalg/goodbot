@@ -17,6 +17,7 @@ The maintenance model is:
 The adaptation work is tracked in:
 
 - `plan/enterprise-adaptation-feasibility.md`
+- `plan/cloud-container-isolation-deferred.md` (deferred follow-up plan; not in current implementation scope)
 - `plan/enterprise-inventory.md`
 - `plan/security-risk-register.md`
 - `plan/security-policy-matrix.md`
