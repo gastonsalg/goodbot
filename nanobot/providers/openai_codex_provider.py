@@ -8,7 +8,6 @@ import json
 from typing import Any, AsyncGenerator
 
 import httpx
-from loguru import logger
 
 from oauth_cli_kit import get_token as get_codex_token
 from nanobot.providers.base import LLMProvider, LLMResponse, ToolCallRequest
@@ -57,13 +56,7 @@ class OpenAICodexProvider(LLMProvider):
         url = DEFAULT_CODEX_URL
 
         try:
-            try:
-                content, tool_calls, finish_reason = await _request_codex(url, headers, body, verify=True)
-            except Exception as e:
-                if "CERTIFICATE_VERIFY_FAILED" not in str(e):
-                    raise
-                logger.warning("SSL certificate verification failed for Codex API; retrying with verify=False")
-                content, tool_calls, finish_reason = await _request_codex(url, headers, body, verify=False)
+            content, tool_calls, finish_reason = await _request_codex(url, headers, body, verify=True)
             return LLMResponse(
                 content=content,
                 tool_calls=tool_calls,
