@@ -3,6 +3,7 @@
 This ExecPlan is a living document. The sections `Progress`, `Surprises & Discoveries`, `Decision Log`, and `Outcomes & Retrospective` must be kept up to date as work proceeds.
 
 This plan defines a research and experimentation track to determine whether this fork can become a secure, enterprise-focused assistant while still staying close enough to upstream (`HKUDS/nanobot`) to pull future core improvements.
+Deferred cloud sandbox-isolation planning is tracked separately in `plan/cloud-container-isolation-deferred.md` and is intentionally out of scope for the current Milestone 5 delivery track.
 
 ## Purpose / Big Picture
 
@@ -37,6 +38,7 @@ After this work, we will know whether this fork can be narrowed to an enterprise
 - [x] (2026-02-11 08:00Z) Fetched `upstream/main` and confirmed 28 new commits are pending for downstream sync review before further implementation.
 - [x] (2026-02-11) Implemented Milestone 7 restricted execution architecture in `ExecTool` for workspace-restricted mode (argv execution, explicit allowlist, no shell grammar) with updated regression coverage.
 - [x] (2026-02-11) Implemented TinyClaw borrow candidate #1 as an optional Codex CLI-backed OpenAI route (`providers.openai.useCodexCli`) for seat-auth environments without OpenAI API credits.
+- [x] (2026-02-16 11:44Z) Added explicit cross-reference to deferred cloud isolation follow-up plan (`plan/cloud-container-isolation-deferred.md`) in this main ExecPlan and top-level docs.
 - [ ] Complete Milestone 5A live Teams chat path (tenant-connected MVP, additive with CLI).
 - [ ] Complete Milestone 5B calendar assistant path (availability first, confirmation-based booking second).
 - [ ] Complete Milestone 5C extension interface spike (Microsoft/Jira/Confluence/Miro adapter contracts with stubs).
@@ -156,6 +158,10 @@ After this work, we will know whether this fork can be narrowed to an enterprise
 - Decision: Prioritize a minimum showable product in Milestone 5 around Teams chat plus calendar scheduling over broader connector interface work.
   Rationale: Demonstrable user value and stakeholder alignment (product + InfoSec) are higher with a concrete Teams/calendar workflow than with abstract connector stubs.
   Date/Author: 2026-02-11 / Codex
+
+- Decision: Keep cloud container-isolation design work in a separate deferred ExecPlan and only reference it from active planning documents.
+  Rationale: This preserves focus on current Milestone 5 deliverables while keeping the cloud-hardening design discoverable and ready for future activation.
+  Date/Author: 2026-02-16 / Codex
 
 ## Outcomes & Retrospective
 
@@ -499,3 +505,4 @@ Plan revision note (2026-02-09): Completed Milestone 2 security baseline impleme
 Plan revision note (2026-02-11): Added TinyClaw research findings and borrow candidates, recorded decision to keep this fork as baseline, and prioritized an upstream sync checkpoint (28 pending commits) before new Milestone 5 implementation work.
 Plan revision note (2026-02-11): Added Milestone 7 and decision-log guidance for architectural restricted-execution hardening; current shell-guard regex/token patches are tracked as interim controls only.
 Plan revision note (2026-02-11): Re-scoped Milestone 5 to a minimum showable product track: 5A live Teams chat, 5B calendar availability + confirmation-based booking, then 5C connector interfaces.
+Plan revision note (2026-02-16): Added cross-references to `plan/cloud-container-isolation-deferred.md` so deferred cloud isolation strategy is discoverable from active planning docs without changing current implementation scope.

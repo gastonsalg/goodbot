@@ -105,4 +105,5 @@ Compatibility paths are currently retained:
 
 - Product/fork overview: `README.md`
 - Execution plan: `plan/enterprise-adaptation-feasibility.md`
+- Deferred cloud isolation follow-up: `plan/cloud-container-isolation-deferred.md`
 - Fork divergence register: `FORK-DIFFERENCES.md`
