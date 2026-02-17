@@ -8,8 +8,8 @@ import json
 from typing import Any, AsyncGenerator
 
 import httpx
-
 from oauth_cli_kit import get_token as get_codex_token
+
 from nanobot.providers.base import LLMProvider, LLMResponse, ToolCallRequest
 
 DEFAULT_CODEX_URL = "https://chatgpt.com/backend-api/codex/responses"
@@ -220,7 +220,7 @@ async def _iter_sse(response: httpx.Response) -> AsyncGenerator[dict[str, Any], 
     async for line in response.aiter_lines():
         if line == "":
             if buffer:
-                data_lines = [l[5:].strip() for l in buffer if l.startswith("data:")]
+                data_lines = [raw_line[5:].strip() for raw_line in buffer if raw_line.startswith("data:")]
                 buffer = []
                 if not data_lines:
                     continue
