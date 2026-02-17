@@ -85,7 +85,6 @@ jobs:
           fail: true
           args: >-
             --no-progress
-            --exclude-mail
             --accept 200,429
             --max-retries 2
             --retry-wait-time 2
