@@ -2,6 +2,12 @@
 
 This repository is an enterprise-focused downstream fork of [HKUDS/nanobot](https://github.com/HKUDS/nanobot).
 
+## What Is goodbot?
+
+`goodbot` is a secure, enterprise-oriented AI assistant runtime. As a product, it lets teams run one assistant across multiple channels (CLI and chat platforms), connect it to approved tools, and enforce organization policies by default (access controls, tool restrictions, and workspace boundaries).
+
+As a product, `goodbot` is designed for enterprise use: safer defaults, clearer access controls, and better governance so organizations can adopt AI assistance without losing control of security and compliance.
+
 ## Fork Intent
 
 This fork exists to adapt upstream nanobot for internal enterprise use with stronger default security controls, a narrower runtime profile, and connector/channel decisions aligned with employer requirements.
