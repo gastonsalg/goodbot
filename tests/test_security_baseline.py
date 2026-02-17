@@ -8,8 +8,8 @@ import pytest
 
 from nanobot.agent.tools.filesystem import _resolve_path
 from nanobot.agent.tools.web import _validate_url
-from nanobot.channels.base import BaseChannel
 from nanobot.bus.queue import MessageBus
+from nanobot.channels.base import BaseChannel
 from nanobot.config.loader import save_config
 from nanobot.config.schema import Config
 from nanobot.security.policy import ToolPolicy
